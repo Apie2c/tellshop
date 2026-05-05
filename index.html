@@ -230,6 +230,16 @@
             background: rgba(236,72,153,0.1);
             color: #0F172A;
         }
+        .subcat-default {
+            background: rgba(219,39,119,0.08) !important;
+            color: #DB2777 !important;
+            font-weight: 800 !important;
+            pointer-events: none !important;
+            opacity: 0.7;
+        }
+        .subcat-default.hidden {
+            display: none !important;
+        }
         .dark .cat-dropdown {
             background: rgba(15,23,42,0.96);
             border-color: rgba(255,255,255,0.10);
@@ -939,6 +949,12 @@
                     title.textContent = 'Subcategories';
                     dropdown.appendChild(title);
 
+                    // Add SUBCATEGORIES placeholder
+                    const subcatDefault = document.createElement('button');
+                    subcatDefault.className = 'subcat-item subcat-default';
+                    subcatDefault.textContent = 'SUBCATEGORIES';
+                    dropdown.appendChild(subcatDefault);
+
                     categoryHierarchy[key].forEach(function(sub) {
                         const subBtn = document.createElement('button');
                         subBtn.className = 'subcat-item';
@@ -1338,6 +1354,12 @@
         currentPage = 1;
         document.querySelectorAll('.cat-chip').forEach(b => b.classList.remove('active-chip'));
         if (el && el.classList.contains('cat-chip')) el.classList.add('active-chip');
+        
+        // Hide SUBCATEGORIES placeholder when main category opens
+        document.querySelectorAll('.subcat-default').forEach(item => {
+            item.classList.add('hidden');
+        });
+        
         // Reshuffle on every tab click so products get a fresh order
         if (cat === 'All') {
             buildAllViewOrder();

@@ -1402,7 +1402,7 @@
         row.style.display = 'flex';
     }
 
-    function filterSubcategory(cat, sub, el) {
+     function filterSubcategory(cat, sub, el) {
         currentFilter = cat;
         currentSubcategory = sub;
         currentPage = 1;
@@ -1413,6 +1413,10 @@
         if (parentBtn) parentBtn.classList.add('active-chip');
         const heroDesk = document.querySelector('.hero-desk');
         if (heroDesk) heroDesk.style.display = 'none';
+        // Hide SUBCATEGORIES placeholder when a sub-category opens
+        document.querySelectorAll('.subcat-default').forEach(item => {
+            item.classList.add('hidden');
+        });
         showMobileSubcategories(cat);
         renderProducts();
     }

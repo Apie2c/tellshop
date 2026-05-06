@@ -1355,10 +1355,12 @@
         document.querySelectorAll('.cat-chip').forEach(b => b.classList.remove('active-chip'));
         if (el && el.classList.contains('cat-chip')) el.classList.add('active-chip');
         
-        // Hide SUBCATEGORIES placeholder when main category opens
-        document.querySelectorAll('.subcat-default').forEach(item => {
-            item.classList.add('hidden');
-        });
+        // Hide SUBCATEGORIES placeholder for this category when it opens
+        const wrapper = el ? el.closest('.cat-chip-wrapper') : null;
+        if (wrapper) {
+            const subcatDefault = wrapper.querySelector('.subcat-default');
+            if (subcatDefault) subcatDefault.classList.add('hidden');
+        }
         
         // Reshuffle on every tab click so products get a fresh order
         if (cat === 'All') {

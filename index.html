@@ -760,38 +760,11 @@
         const loader = document.getElementById('loader');
         const grid = document.getElementById('product-grid');
         try {
-            // ── Step 1: fetch the manifest (index.json) ───────────────
-            // index.json format:
-            // {
-            //   "categories": [
-            //     { "name": "Phones",   "file": "phones.json"   },
-            //     { "name": "Laptops",  "file": "laptops.json"  },
-            //     { "name": "Cameras",  "file": "cameras.json"  }
-            //   ]
-            // }
-            const manifestRes = await fetch('index.json');
-            if (!manifestRes.ok) throw new Error('Failed to fetch index.json');
-            const manifest = await manifestRes.json();
-            const categoryList = manifest.categories; // [{ name, file }, ...]
-
-            // ── Step 2: fetch all category files in parallel ──────────
-            const results = await Promise.all(
-                categoryList.map(async ({ name, file }) => {
-                    const res = await fetch(file);
-                    if (!res.ok) throw new Error(`Failed to fetch ${file}`);
-                    const products = await res.json();
-                    return { name, products };
-                })
-            );
-
-            // ── Step 3: assemble LUXE_VAULT from the results ──────────
+            // ── Load all subcategory files in parallel, driven by categoryHierarchy ──
             LUXE_VAULT = {};
-            results.forEach(({ name, products }) => {
-                LUXE_VAULT[name] = products;
-            });
-
-            productCatalog = Object.keys(LUXE_VAULT)
-                .flatMap(cat => LUXE_VAULT[cat].map(p => ({ ...p, cat })));
+            subCategoryVault = {};
+            subCategoryViewOrders = {};
+            productCatalog = [];
 
             const subcategoryPromises = [];
             Object.entries(categoryHierarchy).forEach(([cat, subs]) => {
@@ -801,7 +774,7 @@
                         Promise.all(paths.map(path => fetch(path).then(res => {
                             if (!res.ok) throw new Error(`Failed to fetch ${path}`);
                             return res.json();
-                        })) ).then(results => ({
+                        }))).then(results => ({
                             cat,
                             sub: sub.name,
                             products: results.flat()
@@ -811,8 +784,6 @@
             });
 
             const subcategoryResults = await Promise.all(subcategoryPromises);
-            subCategoryVault = {};
-            subCategoryViewOrders = {};
             subcategoryResults.forEach(({ cat, sub, products }) => {
                 subCategoryVault[cat] = subCategoryVault[cat] || {};
                 subCategoryVault[cat][sub] = products.map(p => ({ ...p, cat, sub }));
@@ -821,13 +792,12 @@
                 productCatalog.push(...subCategoryVault[cat][sub]);
             });
 
-            // Aggregate subcategories into top-level categories for Boys and Girls
+            // Aggregate subcategory products into each top-level category
             Object.keys(categoryHierarchy).forEach(cat => {
                 if (subCategoryVault[cat]) {
                     LUXE_VAULT[cat] = Object.values(subCategoryVault[cat]).flat();
                 }
             });
-            delete LUXE_VAULT['Kids']; // Remove the old Kids category
 
 
             // Build the initial shuffled All-view order

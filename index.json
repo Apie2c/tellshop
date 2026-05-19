@@ -1,1 +1,8 @@
-{"categories":[{"name":"Mens","file":"mens.json"},{"name":"Womens","file":"womens.json"},{"name":"Kids","file":"kids.json"}]}
+{
+  "categories": [
+    { "name": "Mens",   "folder": "mens" },
+    { "name": "Womens", "folder": "womens" },
+    { "name": "Boys",   "folder": "boys" },
+    { "name": "Girls",  "folder": "girls" }
+  ]
+}
